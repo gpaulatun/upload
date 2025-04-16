@@ -1,0 +1,19 @@
+<?php
+$target_dir = "uploads/";
+$allowed_types = ['jpg', 'jpeg', 'png', 'gif'];
+
+if (!empty($_FILES['images'])) {
+    foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
+        $original_name = basename($_FILES['images']['name'][$key]);
+        $ext = strtolower(pathinfo($original_name, PATHINFO_EXTENSION));
+
+        if (!in_array($ext, $allowed_types)) continue;
+        if (getimagesize($tmp_name) === false) continue;
+
+        $new_name = uniqid("img_", true) . '.' . $ext;
+        $target_file = $target_dir . $new_name;
+
+        move_uploaded_file($tmp_name, $target_file);
+    }
+}
+?>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Wedding Photos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f9;
+      padding: 40px;
+      text-align: center;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin: auto;
+    }
+    img.logo {
+      width: 200px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+    }
+    .note {
+      font-size: 0.95em;
+      color: #666;
+      margin-bottom: 20px;
+    }
+    .gallery-link {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .gallery-link:hover {
+      background-color: #45a049;
+    }
+    #progress-container {
+      margin-top: 20px;
+      display: none;
+    }
+    progress {
+      width: 100%;
+      height: 20px;
+    }
+    #upload-success {
+      display: none;
+      color: #4CAF50;
+      font-weight: bold;
+    }
+    .public-note {
+      font-size: 0.9em;
+      color: #f44336;
+      margin-top: 20px;
+      text-align: center;
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 10px;
+      background-color: #fff3f3;
+      border: 1px solid #f44336;
+      border-radius: 5px;
+    }
+    #select-photos-btn {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    #select-photos-btn:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="https://paulandela.site/wp-content/uploads/2025/03/Untitled.png" alt="Wedding Logo" class="logo">
+    <h1>Upload your photos from our Wedding – 7/19/25</h1>
+    <p class="note">Please upload up to 50 photos at a time</p>
+
+    <form id="upload-form" enctype="multipart/form-data">
+      <button type="button" id="select-photos-btn">Select Photos</button>
+      <input type="file" name="images[]" id="file-input" multiple accept="image/*" style="display: none;" required>
+    </form>
+
+    <div id="progress-container">
+      <progress id="upload-progress" value="0" max="100"></progress>
+      <p id="progress-text">0 of 50 uploaded</p>
+    </div>
+
+    <div id="upload-success" style="display:none;">
+      <p>✅ Upload successful!</p>
+    </div>
+  </div>
+
+  <div class="public-note">
+  <a class="gallery-link" href="gallery.php">View Public Gallery</a>
+    <p><strong>Note:</strong> As this is a public gallery, please refrain from uploading any inappropriate photos. Thank you, and we hope you enjoyed our event!</p>
+    
+  </div>
+
+  <script>
+    document.getElementById("select-photos-btn").addEventListener("click", function() {
+      document.getElementById("file-input").click();
+    });
+
+    document.getElementById("file-input").addEventListener("change", function () {
+      const files = this.files;
+      if (files.length === 0) {
+        alert("Please select images.");
+        return;
+      }
+
+      if (files.length > 50) {
+        alert("You can only upload up to 50 images at once.");
+        return;
+      }
+
+      const progressContainer = document.getElementById("progress-container");
+      const progressBar = document.getElementById("upload-progress");
+      const progressText = document.getElementById("progress-text");
+      const successDiv = document.getElementById("upload-success");
+
+      progressContainer.style.display = "block";
+      progressBar.value = 0;
+      progressText.textContent = `0 of ${files.length} uploaded`;
+
+      let uploaded = 0;
+
+      const uploadNext = () => {
+        if (uploaded >= files.length) {
+          progressText.textContent = "Upload complete!";
+          successDiv.style.display = "block";
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("images[]", files[uploaded]);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "upload.php", true);
+
+        xhr.onload = function () {
+          uploaded++;
+          const percent = Math.round((uploaded / files.length) * 100);
+          progressBar.value = percent;
+          progressText.textContent = `${uploaded} of ${files.length} uploaded`;
+          uploadNext();
+        };
+
+        xhr.onerror = function () {
+          alert("Upload failed for " + files[uploaded].name);
+        };
+
+        xhr.send(formData);
+      };
+
+      uploadNext();
+    });
+  </script>
+</body>
+</html>
