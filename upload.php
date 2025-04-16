@@ -44,12 +44,12 @@ function optimizeImage($file, $ext) {
                 }
             }
 
-            imagejpeg($image, $file, 75); // optimize
+            imagejpeg($image, $file, 75); // Optimize with 75% quality
             break;
 
         case 'png':
             $image = imagecreatefrompng($file);
-            imagepng($image, $file, 6); // compress level 0 (no compression) to 9
+            imagepng($image, $file, 6); // Compress level 0 (no compression) to 9
             break;
 
         case 'gif':
